@@ -8,7 +8,7 @@ namespace CUDAWAVe
 
 
 
-		private int oldChunkSize = 1024;
+		private int oldChunkSize = 65536;
 
 
 
@@ -24,6 +24,12 @@ namespace CUDAWAVe
 
 			// CudaHandling
 			CudaH = new CudaHandling(0, listBox_log, comboBox_cudaDevices);
+
+			// Register events
+
+
+			// Setup UI
+			DrawWaveform();
 		}
 
 
@@ -47,8 +53,28 @@ namespace CUDAWAVe
 			listBox_log.SelectedIndex = listBox_log.Items.Count - 1;
 		}
 
+		public void VramUpdate()
+		{
+			if(CudaH == null)
+			{
+				return;
+			}
+
+			long[] vram = CudaH.GetMemoryUsage(true);
+
+			label_vram.Text = "VRAM: " + vram[2] + " / " + vram[0] + " MB";
+			progressBar_vram.Maximum = (int) vram[0];
+			progressBar_vram.Value = (int) vram[2];
+		}
+
 		public void DrawWaveform()
 		{
+			// Toggle buttons
+			ToggleButtons();
+
+			// Update VRAM
+			VramUpdate();
+
 			// Check AudioHandling
 			if (AudioH == null)
 			{
@@ -59,20 +85,17 @@ namespace CUDAWAVe
 			// Draw
 			int resolution = AudioH.GetFitResolution(pictureBox_waveform.Width);
 			AudioH.DrawWaveformSmooth(pictureBox_waveform, 0, resolution, true);
-
-			// Toggle buttons
-			ToggleButtons();
 		}
 
 		public void ToggleButtons()
 		{
 			// Button move
-			button_move.Enabled = AudioH?.Floats.Length > 0 || CudaH.PtrsLengths.Count > 0;
+			button_move.Enabled = AudioH != null && (AudioH.Floats.Length > 0 || CudaH.PtrsLengths.Count > 0);
 			button_move.Text = AudioH?.Floats.Length > 0 ? "-> Cuda" : "Host <-";
 
 			// Button fft
-			button_fft.Enabled = CudaH.PtrsLengths.Count > 0;
-			button_fft.Text = CudaH.IsTimeDomain ? "IFFT" : "FFT";
+			button_fft.Enabled = AudioH != null && CudaH.PtrsLengths.Count > 0;
+			button_fft.Text = AudioH != null && CudaH.IsTimeDomain ? "IFFT" : "FFT";
 
 		}
 

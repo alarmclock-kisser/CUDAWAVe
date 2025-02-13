@@ -102,6 +102,31 @@ namespace CUDAWAVe
 			return names;
 		}
 
+		public long[] GetMemoryUsage(bool readable = false)
+		{
+			long[] vram = [0, 0, 0];
+
+			try
+			{
+				vram[0] = Ctx?.GetTotalDeviceMemorySize() ?? 0;
+				vram[1] = Ctx?.GetFreeDeviceMemorySize() ?? 0;
+				vram[2] = vram[0] - vram[1];
+			}
+			catch (Exception e)
+			{
+				Log("CUDA memory usage failed", e.Message);
+			}
+
+			if (readable)
+			{
+				vram[0] = vram[0] / 1024 / 1024;
+				vram[1] = vram[1] / 1024 / 1024;
+				vram[2] = vram[2] / 1024 / 1024;
+			}
+
+			return vram;
+		}
+
 
 		// ~~~~~ Init ~~~~~ \\
 		public void InitDevice(int deviceId)
@@ -111,7 +136,7 @@ namespace CUDAWAVe
 			// Abort if no device selected
 			if (deviceId < 0 || deviceId >= GetDeviceCount())
 			{
-				Log("No CUDA device selected");
+				Log("No CUDA device selected", "", 0);
 				return;
 			}
 
@@ -119,11 +144,11 @@ namespace CUDAWAVe
 			{
 				Ctx = new PrimaryContext(deviceId);
 				Ctx.SetCurrent();
-				Log("CUDA device initialized", Ctx.GetDeviceName());
+				Log("CUDA device initialized", Ctx.GetDeviceName(), 0);
 			}
 			catch (Exception e)
 			{
-				Log("CUDA device initialization failed", e.Message);
+				Log("CUDA device initialization failed", e.Message, 0);
 			}
 		}
 
@@ -186,6 +211,7 @@ namespace CUDAWAVe
 					Ctx.CopyToHost(chunk, ptrLength.Key);
 					chunks.Add(chunk);
 
+					PtrsLengths.Remove(ptrLength.Key);
 					Ctx.FreeMemory(ptrLength.Key);
 				}
 			}
@@ -222,6 +248,8 @@ namespace CUDAWAVe
 					plan.Exec(ptr, ptr);
 
 					PtrsLengths[ptr] = length;
+
+					plan.Dispose();
 				}
 			}
 			catch (Exception e)
@@ -255,9 +283,13 @@ namespace CUDAWAVe
 				{
 					CUdeviceptr ptr = PtrsLengths.ElementAt(i).Key;
 					int length = ifftLengths[i];
+
 					CudaFFTPlan1D plan = new(length, cufftType.C2R, 1);
 					plan.Exec(ptr, ptr);
+					
 					PtrsLengths[ptr] = length;
+
+					plan.Dispose();
 				}
 			}
 			catch (Exception e)

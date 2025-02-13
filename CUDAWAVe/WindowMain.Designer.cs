@@ -31,12 +31,14 @@
 			listBox_log = new ListBox();
 			pictureBox_waveform = new PictureBox();
 			groupBox_memory = new GroupBox();
+			button_fft = new Button();
 			label_chunkSize = new Label();
 			numericUpDown_chunkSize = new NumericUpDown();
 			button_move = new Button();
 			button_import = new Button();
 			comboBox_cudaDevices = new ComboBox();
-			button_fft = new Button();
+			label_vram = new Label();
+			progressBar_vram = new ProgressBar();
 			((System.ComponentModel.ISupportInitialize) pictureBox_waveform).BeginInit();
 			groupBox_memory.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize) numericUpDown_chunkSize).BeginInit();
@@ -73,6 +75,16 @@
 			groupBox_memory.TabIndex = 2;
 			groupBox_memory.TabStop = false;
 			groupBox_memory.Text = "Memory";
+			// 
+			// button_fft
+			// 
+			button_fft.Location = new Point(138, 151);
+			button_fft.Name = "button_fft";
+			button_fft.Size = new Size(55, 23);
+			button_fft.TabIndex = 4;
+			button_fft.Text = "FFT";
+			button_fft.UseVisualStyleBackColor = true;
+			button_fft.Click += button_fft_Click;
 			// 
 			// label_chunkSize
 			// 
@@ -123,21 +135,29 @@
 			comboBox_cudaDevices.TabIndex = 3;
 			comboBox_cudaDevices.SelectedIndexChanged += comboBox_cudaDevices_SelectedIndexChanged;
 			// 
-			// button_fft
+			// label_vram
 			// 
-			button_fft.Location = new Point(138, 151);
-			button_fft.Name = "button_fft";
-			button_fft.Size = new Size(55, 23);
-			button_fft.TabIndex = 4;
-			button_fft.Text = "FFT";
-			button_fft.UseVisualStyleBackColor = true;
-			button_fft.Click += button_fft_Click;
+			label_vram.AutoSize = true;
+			label_vram.Location = new Point(12, 38);
+			label_vram.Name = "label_vram";
+			label_vram.Size = new Size(90, 15);
+			label_vram.TabIndex = 4;
+			label_vram.Text = "VRAM: 0 / 0 MB";
+			// 
+			// progressBar_vram
+			// 
+			progressBar_vram.Location = new Point(12, 56);
+			progressBar_vram.Name = "progressBar_vram";
+			progressBar_vram.Size = new Size(200, 10);
+			progressBar_vram.TabIndex = 5;
 			// 
 			// WindowMain
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
 			ClientSize = new Size(704, 681);
+			Controls.Add(progressBar_vram);
+			Controls.Add(label_vram);
 			Controls.Add(comboBox_cudaDevices);
 			Controls.Add(groupBox_memory);
 			Controls.Add(pictureBox_waveform);
@@ -152,6 +172,7 @@
 			groupBox_memory.PerformLayout();
 			((System.ComponentModel.ISupportInitialize) numericUpDown_chunkSize).EndInit();
 			ResumeLayout(false);
+			PerformLayout();
 		}
 
 		#endregion
@@ -165,5 +186,7 @@
 		private Label label_chunkSize;
 		private NumericUpDown numericUpDown_chunkSize;
 		private Button button_fft;
+		private Label label_vram;
+		private ProgressBar progressBar_vram;
 	}
 }
