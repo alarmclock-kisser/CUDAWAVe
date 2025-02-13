@@ -55,7 +55,7 @@ namespace CUDAWAVe
 
 		public void VramUpdate()
 		{
-			if(CudaH == null)
+			if (CudaH == null)
 			{
 				return;
 			}
@@ -69,6 +69,12 @@ namespace CUDAWAVe
 
 		public void DrawWaveform()
 		{
+			// Stop 
+			if (AudioH != null)
+			{
+				AudioH.Stop();
+			}
+
 			// Toggle buttons
 			ToggleButtons();
 
@@ -96,6 +102,15 @@ namespace CUDAWAVe
 			// Button fft
 			button_fft.Enabled = AudioH != null && CudaH.PtrsLengths.Count > 0;
 			button_fft.Text = AudioH != null && CudaH.IsTimeDomain ? "IFFT" : "FFT";
+
+			// Button normalize
+			button_normalizeAfterIfft.Enabled = AudioH != null && AudioH.Floats.Length > 0;
+
+			// Button export
+			button_exportWav.Enabled = AudioH != null && AudioH.Floats.Length > 0;
+
+			// Button playback
+			button_playback.Enabled = AudioH != null && AudioH.Floats.Length > 0;
 
 		}
 
@@ -212,6 +227,57 @@ namespace CUDAWAVe
 
 			// Update UI
 			DrawWaveform();
+		}
+
+		private void button_normalizeAfterIfft_Click(object sender, EventArgs e)
+		{
+			if (AudioH == null || AudioH.Floats.Length == 0)
+			{
+				return;
+			}
+
+			// Normalize
+			AudioH.Normalize();
+
+			// Update UI
+			DrawWaveform();
+		}
+
+		private void button_exportWav_Click(object sender, EventArgs e)
+		{
+			// Abort if no AudioH
+			if (AudioH == null || AudioH.Floats.Length == 0)
+			{
+				return;
+			}
+
+			// SFD at MyMusic
+			SaveFileDialog sfd = new();
+			sfd.Title = "Export audio file";
+			sfd.Filter = "WAV files|*.wav";
+			sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+			sfd.FileName = (AudioH.Name) + "_FFT.wav";
+
+			// SFD show -> AudioHandling
+			if (sfd.ShowDialog() == DialogResult.OK)
+			{
+				AudioH.ExportAudioWav(sfd.FileName);
+			}
+
+			// Log
+			Log("Exported audio file " + Path.GetFileName(sfd.FileName), AudioH.Floats.Length + " samples");
+		}
+
+		private void button_playback_Click(object sender, EventArgs e)
+		{
+			// Abort if no AudioH
+			if (AudioH == null || AudioH.Floats.Length == 0)
+			{
+				return;
+			}
+
+			// Playback
+			AudioH.PlayStop(button_playback);
 		}
 	}
 }

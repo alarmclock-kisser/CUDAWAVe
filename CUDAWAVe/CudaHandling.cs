@@ -234,7 +234,7 @@ namespace CUDAWAVe
 
 			// Toggle domain and calculate FFT lengths
 			IsTimeDomain = true;
-			int[] fftLengths = PtrsLengths.Values.Select(length => length / 2 + 1).ToArray();
+			int[] fftLengths = PtrsLengths.Values.ToArray();
 
 			// Perform FFT
 			try

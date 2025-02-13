@@ -39,9 +39,16 @@
 			comboBox_cudaDevices = new ComboBox();
 			label_vram = new Label();
 			progressBar_vram = new ProgressBar();
+			groupBox_host = new GroupBox();
+			label_export = new Label();
+			button_exportWav = new Button();
+			label_afterIfft = new Label();
+			button_normalizeAfterIfft = new Button();
+			button_playback = new Button();
 			((System.ComponentModel.ISupportInitialize) pictureBox_waveform).BeginInit();
 			groupBox_memory.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize) numericUpDown_chunkSize).BeginInit();
+			groupBox_host.SuspendLayout();
 			SuspendLayout();
 			// 
 			// listBox_log
@@ -151,11 +158,74 @@
 			progressBar_vram.Size = new Size(200, 10);
 			progressBar_vram.TabIndex = 5;
 			// 
+			// groupBox_host
+			// 
+			groupBox_host.Controls.Add(label_export);
+			groupBox_host.Controls.Add(button_exportWav);
+			groupBox_host.Controls.Add(label_afterIfft);
+			groupBox_host.Controls.Add(button_normalizeAfterIfft);
+			groupBox_host.Location = new Point(492, 238);
+			groupBox_host.Name = "groupBox_host";
+			groupBox_host.Size = new Size(200, 180);
+			groupBox_host.TabIndex = 6;
+			groupBox_host.TabStop = false;
+			groupBox_host.Text = "Host";
+			// 
+			// label_export
+			// 
+			label_export.AutoSize = true;
+			label_export.Location = new Point(134, 133);
+			label_export.Name = "label_export";
+			label_export.Size = new Size(40, 15);
+			label_export.TabIndex = 9;
+			label_export.Text = "Export";
+			// 
+			// button_exportWav
+			// 
+			button_exportWav.Location = new Point(134, 151);
+			button_exportWav.Name = "button_exportWav";
+			button_exportWav.Size = new Size(60, 23);
+			button_exportWav.TabIndex = 7;
+			button_exportWav.Text = "WAV";
+			button_exportWav.UseVisualStyleBackColor = true;
+			button_exportWav.Click += button_exportWav_Click;
+			// 
+			// label_afterIfft
+			// 
+			label_afterIfft.AutoSize = true;
+			label_afterIfft.Location = new Point(6, 133);
+			label_afterIfft.Name = "label_afterIfft";
+			label_afterIfft.Size = new Size(58, 15);
+			label_afterIfft.TabIndex = 8;
+			label_afterIfft.Text = "After IFFT";
+			// 
+			// button_normalizeAfterIfft
+			// 
+			button_normalizeAfterIfft.Location = new Point(6, 151);
+			button_normalizeAfterIfft.Name = "button_normalizeAfterIfft";
+			button_normalizeAfterIfft.Size = new Size(70, 23);
+			button_normalizeAfterIfft.TabIndex = 7;
+			button_normalizeAfterIfft.Text = "Normalize";
+			button_normalizeAfterIfft.UseVisualStyleBackColor = true;
+			button_normalizeAfterIfft.Click += button_normalizeAfterIfft_Click;
+			// 
+			// button_playback
+			// 
+			button_playback.Location = new Point(463, 395);
+			button_playback.Name = "button_playback";
+			button_playback.Size = new Size(23, 23);
+			button_playback.TabIndex = 7;
+			button_playback.Text = "⏵";
+			button_playback.UseVisualStyleBackColor = true;
+			button_playback.Click += button_playback_Click;
+			// 
 			// WindowMain
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
 			ClientSize = new Size(704, 681);
+			Controls.Add(button_playback);
+			Controls.Add(groupBox_host);
 			Controls.Add(progressBar_vram);
 			Controls.Add(label_vram);
 			Controls.Add(comboBox_cudaDevices);
@@ -171,6 +241,8 @@
 			groupBox_memory.ResumeLayout(false);
 			groupBox_memory.PerformLayout();
 			((System.ComponentModel.ISupportInitialize) numericUpDown_chunkSize).EndInit();
+			groupBox_host.ResumeLayout(false);
+			groupBox_host.PerformLayout();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -188,5 +260,11 @@
 		private Button button_fft;
 		private Label label_vram;
 		private ProgressBar progressBar_vram;
+		private GroupBox groupBox_host;
+		private Label label_afterIfft;
+		private Button button_normalizeAfterIfft;
+		private Label label_export;
+		private Button button_exportWav;
+		private Button button_playback;
 	}
 }

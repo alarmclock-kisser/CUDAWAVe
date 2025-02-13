@@ -65,7 +65,7 @@ namespace CUDAWAVe
 			{
 				if (playbackButton != null)
 				{
-					playbackButton.Text = "Play";
+					playbackButton.Text = "⏵";
 				}
 				Player.Stop();
 			}
@@ -80,10 +80,19 @@ namespace CUDAWAVe
 
 				if (playbackButton != null)
 				{
-					playbackButton.Text = "Stop";
+					playbackButton.Text = "⏹";
 				}
 				Player.Play();
 			}
+		}
+
+		public void Stop(Button? playbackButton = null)
+		{
+			if (playbackButton != null)
+			{
+				playbackButton.Text = "⏵";
+			}
+			Player.Stop();
 		}
 
 		public byte[] GetBytes()
@@ -185,7 +194,8 @@ namespace CUDAWAVe
 			WaveFileWriter writer = new(filepath, format);
 
 			// Write audio data
-			writer.WriteSamples(Floats, 0, Floats.Length);
+			byte[] bytes = GetBytes();
+			writer.Write(bytes, 0, bytes.Length);
 
 			// Close writer
 			writer.Close();
