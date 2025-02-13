@@ -31,10 +31,15 @@
 			listBox_log = new ListBox();
 			pictureBox_waveform = new PictureBox();
 			groupBox_memory = new GroupBox();
+			label_chunkSize = new Label();
+			numericUpDown_chunkSize = new NumericUpDown();
+			button_move = new Button();
 			button_import = new Button();
 			comboBox_cudaDevices = new ComboBox();
+			button_fft = new Button();
 			((System.ComponentModel.ISupportInitialize) pictureBox_waveform).BeginInit();
 			groupBox_memory.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize) numericUpDown_chunkSize).BeginInit();
 			SuspendLayout();
 			// 
 			// listBox_log
@@ -57,6 +62,10 @@
 			// 
 			// groupBox_memory
 			// 
+			groupBox_memory.Controls.Add(button_fft);
+			groupBox_memory.Controls.Add(label_chunkSize);
+			groupBox_memory.Controls.Add(numericUpDown_chunkSize);
+			groupBox_memory.Controls.Add(button_move);
 			groupBox_memory.Controls.Add(button_import);
 			groupBox_memory.Location = new Point(12, 238);
 			groupBox_memory.Name = "groupBox_memory";
@@ -64,6 +73,36 @@
 			groupBox_memory.TabIndex = 2;
 			groupBox_memory.TabStop = false;
 			groupBox_memory.Text = "Memory";
+			// 
+			// label_chunkSize
+			// 
+			label_chunkSize.AutoSize = true;
+			label_chunkSize.Location = new Point(113, 19);
+			label_chunkSize.Name = "label_chunkSize";
+			label_chunkSize.Size = new Size(64, 15);
+			label_chunkSize.TabIndex = 4;
+			label_chunkSize.Text = "Chunk size";
+			// 
+			// numericUpDown_chunkSize
+			// 
+			numericUpDown_chunkSize.Location = new Point(113, 37);
+			numericUpDown_chunkSize.Maximum = new decimal(new int[] { 1048576, 0, 0, 0 });
+			numericUpDown_chunkSize.Minimum = new decimal(new int[] { 1024, 0, 0, 0 });
+			numericUpDown_chunkSize.Name = "numericUpDown_chunkSize";
+			numericUpDown_chunkSize.Size = new Size(80, 23);
+			numericUpDown_chunkSize.TabIndex = 4;
+			numericUpDown_chunkSize.Value = new decimal(new int[] { 65536, 0, 0, 0 });
+			numericUpDown_chunkSize.ValueChanged += numericUpDown_chunkSize_ValueChanged;
+			// 
+			// button_move
+			// 
+			button_move.Location = new Point(67, 151);
+			button_move.Name = "button_move";
+			button_move.Size = new Size(65, 23);
+			button_move.TabIndex = 4;
+			button_move.Text = "Move";
+			button_move.UseVisualStyleBackColor = true;
+			button_move.Click += button_move_Click;
 			// 
 			// button_import
 			// 
@@ -73,6 +112,7 @@
 			button_import.TabIndex = 3;
 			button_import.Text = "Import";
 			button_import.UseVisualStyleBackColor = true;
+			button_import.Click += button_import_Click;
 			// 
 			// comboBox_cudaDevices
 			// 
@@ -81,6 +121,17 @@
 			comboBox_cudaDevices.Name = "comboBox_cudaDevices";
 			comboBox_cudaDevices.Size = new Size(200, 23);
 			comboBox_cudaDevices.TabIndex = 3;
+			comboBox_cudaDevices.SelectedIndexChanged += comboBox_cudaDevices_SelectedIndexChanged;
+			// 
+			// button_fft
+			// 
+			button_fft.Location = new Point(138, 151);
+			button_fft.Name = "button_fft";
+			button_fft.Size = new Size(55, 23);
+			button_fft.TabIndex = 4;
+			button_fft.Text = "FFT";
+			button_fft.UseVisualStyleBackColor = true;
+			button_fft.Click += button_fft_Click;
 			// 
 			// WindowMain
 			// 
@@ -98,6 +149,8 @@
 			Text = "CUDAWAVe (GUI)";
 			((System.ComponentModel.ISupportInitialize) pictureBox_waveform).EndInit();
 			groupBox_memory.ResumeLayout(false);
+			groupBox_memory.PerformLayout();
+			((System.ComponentModel.ISupportInitialize) numericUpDown_chunkSize).EndInit();
 			ResumeLayout(false);
 		}
 
@@ -108,5 +161,9 @@
 		private GroupBox groupBox_memory;
 		private Button button_import;
 		private ComboBox comboBox_cudaDevices;
+		private Button button_move;
+		private Label label_chunkSize;
+		private NumericUpDown numericUpDown_chunkSize;
+		private Button button_fft;
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using ManagedCuda;
 using ManagedCuda.BasicTypes;
+using ManagedCuda.CudaFFT;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,8 @@ namespace CUDAWAVe
 
 		public PrimaryContext? Ctx = null;
 
-
+		public Dictionary<CUdeviceptr, int> PtrsLengths = [];
+		public bool IsTimeDomain = false;
 
 
 
@@ -133,9 +135,9 @@ namespace CUDAWAVe
 
 
 		// ~~~~~ Memory ~~~~~ \\
-		public Dictionary<CUdeviceptr, long> PushToCuda(List<float[]> chunks)
+		public Dictionary<CUdeviceptr, int> PushToCuda(List<float[]> chunks)
 		{
-			Dictionary<CUdeviceptr, long> ptrs = [];
+			Dictionary<CUdeviceptr, int> ptrs = [];
 
 			// Abort if no Ctx
 			if (Ctx == null)
@@ -163,7 +165,7 @@ namespace CUDAWAVe
 			return ptrs;
 		}
 
-		public List<float[]> PullFromCuda(Dictionary<CUdeviceptr, long> ptrsLengths)
+		public List<float[]> PullFromCuda(Dictionary<CUdeviceptr, int> ptrsLengths)
 		{
 			List<float[]> chunks = [];
 
@@ -177,12 +179,14 @@ namespace CUDAWAVe
 			// Pull chunks
 			try
 			{
-				foreach (KeyValuePair<CUdeviceptr, long> ptrLength in ptrsLengths)
+				foreach (KeyValuePair<CUdeviceptr, int> ptrLength in ptrsLengths)
 				{
 					float[] chunk = new float[ptrLength.Value];
 
 					Ctx.CopyToHost(chunk, ptrLength.Key);
 					chunks.Add(chunk);
+
+					Ctx.FreeMemory(ptrLength.Key);
 				}
 			}
 			catch (Exception e)
@@ -191,6 +195,80 @@ namespace CUDAWAVe
 			}
 
 			return chunks;
+		}
+
+		public void PerformFFT()
+		{
+			// Abort if no Ctx, no PtrsLengths or in Time Domain
+			if (Ctx == null || PtrsLengths.Count == 0 || IsTimeDomain)
+			{
+				Log("No CUDA device initialized or no chunks in frequency domain");
+				return;
+			}
+
+			// Toggle domain and calculate FFT lengths
+			IsTimeDomain = true;
+			int[] fftLengths = PtrsLengths.Values.Select(length => length / 2 + 1).ToArray();
+
+			// Perform FFT
+			try
+			{
+				for (int i = 0; i < PtrsLengths.Count; i++)
+				{
+					CUdeviceptr ptr = PtrsLengths.ElementAt(i).Key;
+					int length = fftLengths[i];
+
+					CudaFFTPlan1D plan = new(length, cufftType.R2C, 1);
+					plan.Exec(ptr, ptr);
+
+					PtrsLengths[ptr] = length;
+				}
+			}
+			catch (Exception e)
+			{
+				Log("CUDA FFT failed", e.Message);
+				return;
+			}
+
+			// Log
+			Log("CUDA FFT performed on " + PtrsLengths.Count + " chunks");
+			return;
+		}
+
+		public void PerformIFFT()
+		{
+			// Abort if no Ctx, no PtrsLengths or not in Time Domain
+			if (Ctx == null || PtrsLengths.Count == 0 || !IsTimeDomain)
+			{
+				Log("No CUDA device initialized or chunks not in time domain");
+				return;
+			}
+
+			// Toggle domain and calculate IFFT lengths
+			IsTimeDomain = false;
+			int[] ifftLengths = PtrsLengths.Values.Select(length => (length - 1) * 2).ToArray();
+
+			// Perform IFFT
+			try
+			{
+				for (int i = 0; i < PtrsLengths.Count; i++)
+				{
+					CUdeviceptr ptr = PtrsLengths.ElementAt(i).Key;
+					int length = ifftLengths[i];
+					CudaFFTPlan1D plan = new(length, cufftType.C2R, 1);
+					plan.Exec(ptr, ptr);
+					PtrsLengths[ptr] = length;
+				}
+			}
+			catch (Exception e)
+			{
+				Log("CUDA IFFT failed", e.Message);
+				return;
+			}
+
+			// Log
+			Log("CUDA IFFT performed on " + PtrsLengths.Count + " chunks");
+			return;
 		}
 	}
 }
